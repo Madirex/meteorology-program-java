@@ -1,12 +1,10 @@
 package com.madirex.repositories.meteorology;
 
 import com.madirex.models.MeteorologyData;
-import com.madirex.models.Model;
 import com.madirex.services.database.DatabaseManager;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +30,7 @@ public class MeteorologyDataRepositoryImpl implements MeteorologyDataRepository 
         while (res.next()) {
             list.add(MeteorologyData.builder()
                     .uuid(UUID.fromString(res.getString("ID")))
+                    .date(res.getDate("DayDate").toLocalDate())
                     .location(res.getString("Location"))
                     .province(res.getString("Province"))
                     .maxTemperature(res.getFloat("MaxTemperature"))
@@ -59,6 +58,7 @@ public class MeteorologyDataRepositoryImpl implements MeteorologyDataRepository 
         if (res.next()) {
             optReturn = Optional.of(MeteorologyData.builder()
                     .uuid(UUID.fromString(res.getString("ID")))
+                    .date(res.getDate("DayDate").toLocalDate())
                     .location(res.getString("Location"))
                     .province(res.getString("Province"))
                     .maxTemperature(res.getFloat("MaxTemperature"))
@@ -80,17 +80,18 @@ public class MeteorologyDataRepositoryImpl implements MeteorologyDataRepository 
      */
     @Override
     public Optional<MeteorologyData> save(MeteorologyData entity) throws SQLException {
-        var sql = "INSERT INTO meteorologyData (ID, Location, Province, MaxTemperature, MaxTemperatureTime, MinTemperature, MinTemperatureTime, Precipitation) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        var sql = "INSERT INTO meteorologyData (ID, DayDate, Location, Province, MaxTemperature, MaxTemperatureTime, MinTemperature, MinTemperatureTime, Precipitation) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         database.open();
         database.insertAndGetKey(sql, entity.getUuid().toString(),
-                        entity.getLocation(),
-                        entity.getProvince(),
-                        entity.getMaxTemperature(),
-                        entity.getMaxTemperatureTime(),
-                        entity.getMinTemperature(),
-                        entity.getMinTemperatureTime(),
-                        entity.getPrecipitation());
+                entity.getDate(),
+                entity.getLocation(),
+                entity.getProvince(),
+                entity.getMaxTemperature(),
+                entity.getMaxTemperatureTime(),
+                entity.getMinTemperature(),
+                entity.getMinTemperatureTime(),
+                entity.getPrecipitation());
         database.close();
         return Optional.of(entity);
     }
@@ -119,18 +120,19 @@ public class MeteorologyDataRepositoryImpl implements MeteorologyDataRepository 
      */
     @Override
     public Optional<MeteorologyData> update(String id, MeteorologyData entity) throws SQLException {
-        var sql = "UPDATE meteorologyData SET Location = ?, Province = ?, MaxTemperature = ?, MaxTemperatureTime = ?, " +
+        var sql = "UPDATE meteorologyData SET DayDate = ?, Location = ?, Province = ?, MaxTemperature = ?, MaxTemperatureTime = ?, " +
                 "MinTemperature = ?, MinTemperatureTime = ?, Precipitation = ? WHERE ID = ?";
         database.open();
         database.update(sql,
-                        entity.getLocation(),
-                        entity.getProvince(),
-                        entity.getMaxTemperature(),
-                        entity.getMaxTemperatureTime(),
-                        entity.getMinTemperature(),
-                        entity.getMinTemperatureTime(),
-                        entity.getPrecipitation(),
-                        id);
+                entity.getDate(),
+                entity.getLocation(),
+                entity.getProvince(),
+                entity.getMaxTemperature(),
+                entity.getMaxTemperatureTime(),
+                entity.getMinTemperature(),
+                entity.getMinTemperatureTime(),
+                entity.getPrecipitation(),
+                id);
         database.close();
         return Optional.of(entity);
     }

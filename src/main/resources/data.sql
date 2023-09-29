@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS MeteorologyData;
 CREATE TABLE IF NOT EXISTS MeteorologyData (
                                  ID UUID DEFAULT RANDOM_UUID() NOT NULL PRIMARY KEY,
+                                 DayDate DATE,
                                  Location VARCHAR(255),
                                  Province VARCHAR(255),
                                  MaxTemperature DECIMAL(5, 2),
