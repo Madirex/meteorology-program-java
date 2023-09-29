@@ -8,12 +8,11 @@ import com.madirex.services.database.DatabaseManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-public class MeteorologyDataController implements BaseController<MeteorologyData>{
+public class MeteorologyDataController implements BaseController<MeteorologyData> {
     private final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
 
     private final MeteorologyDataService meteorologyDataService;

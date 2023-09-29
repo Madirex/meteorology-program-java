@@ -1,20 +1,21 @@
 package com.madirex.services.io;
 
-import com.madirex.exceptions.CreateFolderException;
 import com.madirex.exceptions.ReadCSVFailException;
 import com.madirex.models.MeteorologyData;
+import com.madirex.utils.UtilParsers;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Clase CsvManager que administra la exportación e importación de datos CSV
@@ -43,24 +44,39 @@ public class CsvManager {
         return csvManagerInstance;
     }
 
-    /**
-     * Lee un archivo CSV y lo convierte en un Optional de la lista de MeteorologyData
-     *
-     * @param path Ruta del archivo CSV
-     * @return Optional de la lista de MeteorologyData
-     */
-    public Optional<List<MeteorologyData>> fileToMeteorologyDataList(String path) throws ReadCSVFailException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
-            return Optional.of(reader.lines()
-                    .map(line -> line.split(","))
-                    .skip(1)
+    public List<MeteorologyData> folderDataToMeteorologyList(String path) throws ReadCSVFailException {
+        List<MeteorologyData> totalData = new ArrayList<>();
+        try (DirectoryStream<Path> directoryStream = java.nio.file.Files.newDirectoryStream(Paths.get(path))) {
+            for (Path filePath : directoryStream) {
+                if (java.nio.file.Files.isRegularFile(filePath)) {
+                    String fileName = filePath.getFileName().toString();
+                    totalData.addAll(fileToMeteorologyDataList(path, fileName));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return totalData;
+    }
+
+    public List<MeteorologyData> fileToMeteorologyDataList(String path, String fileName) throws ReadCSVFailException {
+        LocalDate date = UtilParsers.getInstance().parseFileNameToDate(fileName);
+        try (BufferedReader reader = new BufferedReader(new FileReader(path + File.separator + fileName))) {
+            return reader.lines()
+                    .map(line -> line.split(";"))
                     .map(values -> MeteorologyData.builder()
-                            //TODO: VALUES LOAD
+                            .date(date)
+                            .location(values[0])
+                            .province(values[1])
+                            .maxTemperature(Float.parseFloat(values[2]))
+                            .maxTemperatureTime(UtilParsers.parseLocalTime(values[3]))
+                            .minTemperature(Float.parseFloat(values[4]))
+                            .minTemperatureTime(UtilParsers.parseLocalTime(values[5]))
+                            .precipitation(Float.parseFloat(values[6]))
                             .build()
                     )
-                    .toList());
+                    .toList();
         } catch (IOException e) {
             throw new ReadCSVFailException(e.getMessage());
         }

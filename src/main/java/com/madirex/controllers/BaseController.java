@@ -15,9 +15,9 @@ public interface BaseController<T> {
 
     Optional<T> findById(String id) throws SQLException, MeteorologyDataNotFoundException;
 
-    Optional<T> save(T entity) throws SQLException, MeteorologyNotValidDataException;
+    Optional<T> save(T entity) throws SQLException;
 
-    Optional<T> update(String id, T entity) throws SQLException, MeteorologyNotValidDataException, MeteorologyDataNotFoundException;
+    Optional<T> update(String id, T entity) throws SQLException, MeteorologyDataNotFoundException;
 
     Optional<T> delete(String id) throws SQLException, MeteorologyDataNotFoundException;
 }
