@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 /**
- * Clase principal de la aplicación
+ * Clase principal de la aplicaciï¿½n
  */
 public class MeteorologyApp {
 
@@ -27,7 +27,7 @@ public class MeteorologyApp {
     }
 
     /**
-     * Método que devuelve la instancia de MeteorologyApp
+     * Mï¿½todo que devuelve la instancia de MeteorologyApp
      *
      * @return Instancia de MeteorologyApp
      */
@@ -39,7 +39,7 @@ public class MeteorologyApp {
     }
 
     /**
-     * Método que ejecuta la aplicación
+     * Mï¿½todo que ejecuta la aplicaciï¿½n
      */
     public void run() {
         MeteorologyDataController controller = new MeteorologyDataController
@@ -52,6 +52,11 @@ public class MeteorologyApp {
         } catch (ReadCSVFailException e) {
             logger.error("Error al leer el CSV", e);
         }
+
+        //TODO: PRINTEAR CONSULTAS API STREAM
         controller.findAll().forEach(e -> logger.info(e.toString()));
+
+        //TODO: EXPORTAR LOS DATOS DE UNA PROVINCIA DADA A UN FICHERO JSON
+        System.out.println("Ã¡fs");
     }
 }

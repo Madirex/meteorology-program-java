@@ -73,7 +73,7 @@ public class CsvManager {
     public List<MeteorologyData> fileToMeteorologyDataList(String path, String fileName) throws ReadCSVFailException {
         LocalDate date = UtilParsers.getInstance().parseFileNameToDate(fileName);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream
-                (path + File.separator + fileName), StandardCharsets.UTF_8))) {
+                (path + File.separator + fileName), StandardCharsets.ISO_8859_1))) {
             return reader.lines()
                     .map(line -> line.split(";"))
                     .map(values -> MeteorologyData.builder()
