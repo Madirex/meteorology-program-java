@@ -2,7 +2,7 @@ plugins {
     id("java")
 }
 
-group = "com.madirex"
+group = "com.madiben"
 version = "1.0-SNAPSHOT"
 
 repositories {
