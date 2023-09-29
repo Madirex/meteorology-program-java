@@ -2,15 +2,16 @@ package com.madirex.models;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Data
 @Builder
-@Getter
 public class MeteorologyData {
-    private String locality;
+    @Builder.Default
+    private UUID uuid = UUID.randomUUID();
+    private String location;
     private String province;
     private float maxTemperature;
     private LocalTime maxTemperatureTime;

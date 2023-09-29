@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.time.LocalTime;
 import java.util.List;
 
-public class MeteorologyController {
+public class MeteorologyController implements BaseController<MeteorologyData>{
     private static MeteorologyController Instance;
     private MeteorologyController() {
     }
@@ -45,7 +45,7 @@ public class MeteorologyController {
     private MeteorologyData getMeteorology(String linea) {
         String[] campos = linea.split(";");
         return MeteorologyData.builder()
-                .locality(campos[0])
+                .location(campos[0])
                 .province(campos[1])
                 .maxTemperature(Float.parseFloat(campos[2]))
                 .maxTemperatureTime(LocalTime.parse(campos[3]))
