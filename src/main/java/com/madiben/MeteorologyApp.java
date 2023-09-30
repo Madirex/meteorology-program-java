@@ -62,6 +62,24 @@ public class MeteorologyApp {
         System.out.println("Número de elementos: " + controller.findAll().size());
 
         /////////////////////////////////////
+        StringBuilder str = new StringBuilder();
+        controller.dataGrouper().forEach(e -> {
+            str.append("\n");
+            str.append("Fecha: ").append(e.getDate()).append("\t").append("Provincia: ").append(e.getProvince())
+                    .append("\n");
+            str.append("Máxima temperatura: ").append(controller.maxTemperature(e.getMeteorologyData())).append("\n");
+            str.append("Mínima temperatura: ").append(0.0).append("\n");
+            str.append("Media de temperatura: ").append(0.0).append("\n");
+            str.append("Media de precipitación: ").append(0.0).append("\n");
+            str.append("Lugares donde ha llovido: ").append(0.0).append("\n");
+        });
+        if (str.isEmpty()){
+            str.append("No hay datos");
+        }
+        logger.info(str.toString());
+
+        /////////////////////////////////////
+
         printMaxPrecipitationData();
         printDayDataByProvince("Barcelona");
 

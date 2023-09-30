@@ -206,21 +206,36 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Devuelve una lista de MeteorologyDataGropuedDTO con los datos de meteorología agrupados por fecha y provincia
+     *
+     * @return Lista de MeteorologyDataGropuedDTO con los datos de meteorología agrupados por fecha y provincia
+     */
     public List<MeteorologyDataGropuedDTO> dataGrouper() {
-        List<MeteorologyDataGropuedDTO> DataGrouped = findAll().stream()
-                .collect(Collectors.groupingBy(MeteorologyData::getProvince))
-                .map(entry1 -> {
-                    String province1 = entry1.getKey();
-                    List<MeteorologyData> dataList1 = entry1.getValue();
-                    Optional<MeteorologyData> minTemperatureData1 = dataList1.stream()
-                            .min(Comparator.comparingDouble(MeteorologyData::getMinTemperature));
-                    return MeteorologyDataGropuedDTO.builder()
-                            .date(date)
-                            .province(province1)
-                            .meteorologyData(minTemperatureData1)
-                            .build();
-                })
-                .toList();
+        Map<LocalDate, Map<String, List<MeteorologyData>>> groupedData = findAll().stream()
+                .collect(Collectors.groupingBy(MeteorologyData::getDate,
+                        Collectors.groupingBy(MeteorologyData::getProvince)));
+        List<MeteorologyDataGropuedDTO> result = new ArrayList<>();
+        groupedData.forEach((date, provinceDataMap) -> provinceDataMap.forEach((province, meteorologyDataList) ->
+                result.add(MeteorologyDataGropuedDTO.builder()
+                .date(date)
+                .province(province)
+                .meteorologyData(meteorologyDataList)
+                .build()
+        )));
+        return result;
     }
 
+    /**
+     * Devuelve la temperatura máxima de una lista de MeteorologyData
+     *
+     * @param dataList Lista de MeteorologyData
+     * @return Temperatura máxima
+     */
+    public float maxTemperature(List<MeteorologyData> dataList) {
+        return dataList.stream()
+                .max(Comparator.comparing(MeteorologyData::getMaxTemperature))
+                .map(MeteorologyData::getMaxTemperature)
+                .orElse(0.0f);
+    }
 }

@@ -5,15 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.List;
 
 /**
- * Clase MeteorologyProvinceData que representa los datos de meteorología de una provincia
+ * Clase MeteorologyDataGropuedDTO que representa los datos de meteorología agrupados por fecha y provincia
  */
 @Data
 @Builder
 public class MeteorologyDataGropuedDTO {
     private LocalDate date;
     private String province;
-    private Optional<MeteorologyData> meteorologyData;
+    private List<MeteorologyData> meteorologyData;
 }
