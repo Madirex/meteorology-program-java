@@ -218,11 +218,11 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
         List<MeteorologyDataGropuedDTO> result = new ArrayList<>();
         groupedData.forEach((date, provinceDataMap) -> provinceDataMap.forEach((province, meteorologyDataList) ->
                 result.add(MeteorologyDataGropuedDTO.builder()
-                .date(date)
-                .province(province)
-                .meteorologyData(meteorologyDataList)
-                .build()
-        )));
+                        .date(date)
+                        .province(province)
+                        .meteorologyData(meteorologyDataList)
+                        .build()
+                )));
         return result;
     }
 
@@ -238,4 +238,30 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
                 .map(MeteorologyData::getMaxTemperature)
                 .orElse(0.0f);
     }
+
+    public float minTemperature(List<MeteorologyData> dataList) {
+        return dataList.stream()
+                .min(Comparator.comparing(MeteorologyData::getMinTemperature))
+                .map(MeteorologyData::getMinTemperature)
+                .orElse(0.0f);
+    }
+
+    public double avgPrecipitation(List<MeteorologyData> dataList) {
+        return  dataList.stream()
+                .mapToDouble(meteorologyData -> meteorologyData.getPrecipitation())
+                .average()
+                .orElse(0.0);
+
+
+
+    }
+    public List<String> withPrecipitation(List<MeteorologyData> dataList) {
+        return dataList.stream()
+                .filter(meteorologyData -> meteorologyData.getPrecipitation() > 0)
+                .map(MeteorologyData::getLocation)
+                .toList();
+    }
+
+
+
 }
