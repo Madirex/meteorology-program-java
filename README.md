@@ -33,7 +33,7 @@ Tras subir los datos del CSV a la base de datos H2, se realizan una serie de con
 Para terminar, el programa exporta los datos de la base de datos de una provincia a un CSV.
 
 ## 💡 Instrucciones de uso
-- ? **.env:** Este fichero se deberá de crear en la carpeta resources con los siguientes datos:
+- ⚠ **.env:** Este fichero se deberá de crear en la carpeta resources con los siguientes datos:
 
         DATABASE_USER=usuario
         DATABASE_PASSWORD=contraseña
