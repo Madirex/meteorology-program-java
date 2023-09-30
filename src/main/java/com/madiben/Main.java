@@ -1,12 +1,13 @@
 package com.madiben;
 
 /**
- * Clase principal de la aplicación
+ * Clase principal de la aplicaciï¿½n
  */
 public class Main {
     /**
-     * Método principal de la aplicación
-     * @param args Argumentos de la aplicación
+     * MÃ©todo principal de la aplicaciÃ³n
+     *
+     * @param args Argumentos de la aplicaciÃ³n
      */
     public static void main(String[] args) {
         MeteorologyApp.getInstance().run();

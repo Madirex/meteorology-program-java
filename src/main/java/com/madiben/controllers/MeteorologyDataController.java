@@ -99,7 +99,7 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
      * Elimina un elemento del repositorio
      *
      * @param id Id del elemento a eliminar
-     * @return �eliminado?
+     * @return ¿eliminado?
      */
     public boolean delete(String id) {
         boolean removed = false;

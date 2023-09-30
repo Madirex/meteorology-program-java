@@ -44,8 +44,6 @@ public class MeteorologyApp {
      * Método que ejecuta la aplicación
      */
     public void run() {
-        int counter = 0;
-
         try {
             for (MeteorologyData meteorologyData : CsvManager.getInstance()
                     .folderDataToMeteorologyList(System.getProperty("user.dir") + File.separator + "data")) {
@@ -53,13 +51,10 @@ public class MeteorologyApp {
                 if (meteorologyData.getLocation().equalsIgnoreCase("Leciñena")) {
                     System.out.println("=DDDDDDDDDDD");
                 }
-                counter++;
             }
         } catch (ReadCSVFailException e) {
             logger.error("Error al leer el CSV", e);
         }
-
-
 
         //TODO: PRINTEAR CONSULTAS API STREAM
         System.out.println("Número de elementos: " + controller.findAll().size());

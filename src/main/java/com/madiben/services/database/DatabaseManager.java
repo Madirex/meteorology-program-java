@@ -156,7 +156,8 @@ public class DatabaseManager {
      * @throws SQLException No se ha podido realizar la consulta o la tabla no existe o el desplazamiento
      *                      es mayor que el número de registros
      */
-    public Optional<ResultSet> select(@NonNull String querySQL, int limit, int offset, Object... params) throws SQLException {
+    public Optional<ResultSet> select(@NonNull String querySQL, int limit, int offset, Object... params)
+            throws SQLException {
         String query = querySQL + " LIMIT " + limit + " OFFSET " + offset;
         return Optional.of(executeQuery(query, params));
     }
