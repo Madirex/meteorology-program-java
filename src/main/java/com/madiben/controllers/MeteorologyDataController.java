@@ -5,7 +5,7 @@ import com.madiben.models.MeteorologyData;
 import com.madiben.models.dto.MeteorologyDataGroupedDTO;
 import com.madiben.models.dto.MeteorologyDayData;
 import com.madiben.models.dto.MeteorologyProvinceDayData;
-import com.madiben.services.crud.meteorology.MeteorologyDataService;
+import com.madiben.services.CRUD.meteorology.MeteorologyDataService;
 import com.madiben.services.database.DatabaseManager;
 import com.madiben.services.io.ExportManager;
 import org.slf4j.Logger;

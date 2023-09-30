@@ -1,4 +1,4 @@
-package com.madiben.services.crud;
+package com.madiben.services.CRUD;
 
 import java.sql.SQLException;
 import java.util.List;

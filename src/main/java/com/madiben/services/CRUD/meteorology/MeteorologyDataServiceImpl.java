@@ -1,4 +1,4 @@
-package com.madiben.services.crud.meteorology;
+package com.madiben.services.CRUD.meteorology;
 
 import com.madiben.models.MeteorologyData;
 import com.madiben.repositories.meteorology.MeteorologyDataRepository;

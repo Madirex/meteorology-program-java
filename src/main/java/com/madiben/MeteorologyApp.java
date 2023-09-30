@@ -4,7 +4,7 @@ import com.madiben.controllers.MeteorologyDataController;
 import com.madiben.exceptions.ReadCSVFailException;
 import com.madiben.models.MeteorologyData;
 import com.madiben.repositories.meteorology.MeteorologyDataRepositoryImpl;
-import com.madiben.services.crud.meteorology.MeteorologyDataServiceImpl;
+import com.madiben.services.CRUD.meteorology.MeteorologyDataServiceImpl;
 import com.madiben.services.database.DatabaseManager;
 import com.madiben.services.io.CsvManager;
 import org.slf4j.Logger;
