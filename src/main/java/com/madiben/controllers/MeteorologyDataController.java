@@ -7,11 +7,13 @@ import com.madiben.models.dto.MeteorologyProvinceDayData;
 import com.madiben.services.crud.meteorology.MeteorologyDataService;
 import com.madiben.services.database.DatabaseManager;
 import com.madiben.services.io.ExportManager;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -165,45 +167,72 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
      * @param province Provincia a consultar
      * @return Lista de MeteorologyProvinceDayData con los datos de cada día de la provincia
      */
-    public List<MeteorologyProvinceDayData> getProvinceData(String province) {
-        List<MeteorologyData> provinceList = findAll().stream()
-                .filter(data -> data.getProvince().equalsIgnoreCase(province)).toList();
-        Map<LocalDate, List<MeteorologyData>> dateMap = provinceList.stream()
-                .collect(Collectors.groupingBy(MeteorologyData::getDate));
+    public List<MeteorologyProvinceDayData> getProvinceDataFilterByProvince(String province) {
+        Map<LocalDate, List<MeteorologyData>> dateMap = mapDataByDate(province);
         return dateMap.entrySet().stream().map(entry -> {
-                    LocalDate date = entry.getKey();
                     List<MeteorologyData> dataList = entry.getValue();
-                    Optional<MeteorologyData> maxTemperatureData = dataList.stream()
-                            .max(Comparator.comparingDouble(MeteorologyData::getMaxTemperature));
-                    Optional<MeteorologyData> minTemperatureData = dataList.stream()
-                            .min(Comparator.comparingDouble(MeteorologyData::getMaxTemperature));
-                    double avgMaxTemperature = dataList.stream()
-                            .mapToDouble(MeteorologyData::getMaxTemperature)
-                            .average()
-                            .orElse(0.0);
-
-                    double avgMinTemperature = dataList.stream()
-                            .mapToDouble(MeteorologyData::getMinTemperature)
-                            .average()
-                            .orElse(0.0);
-                    Optional<MeteorologyData> maxPrecipitation = dataList.stream()
-                            .max(Comparator.comparingDouble(MeteorologyData::getPrecipitation));
-                    double avgPrecipitation = dataList.stream()
-                            .mapToDouble(MeteorologyData::getPrecipitation)
-                            .average()
-                            .orElse(0.0);
-
                     return MeteorologyProvinceDayData.builder()
-                            .date(date)
-                            .maxTemperature(maxTemperatureData)
-                            .minTemperature(minTemperatureData)
-                            .avgMaxTemperature(avgMaxTemperature)
-                            .avgMinTemperature(avgMinTemperature)
-                            .maxPrecipitation(maxPrecipitation)
-                            .avgPrecipitation(avgPrecipitation)
+                            .date(entry.getKey())
+                            .maxTemperature(getMaxTemperature(dataList))
+                            .minTemperature(getMinTemperature(dataList))
+                            .avgMaxTemperature(getAvgMaxTemperature(dataList))
+                            .avgMinTemperature(getAvgMinTemperature(dataList))
+                            .maxPrecipitation(getMaxPrecipitation(dataList))
+                            .avgPrecipitation(getAvgPrecipitation(dataList))
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    @NotNull
+    private Map<LocalDate, List<MeteorologyData>> mapDataByDate(String province) {
+        return filterByProvince(province).stream()
+                .collect(Collectors.groupingBy(MeteorologyData::getDate));
+    }
+
+    @NotNull
+    private List<MeteorologyData> filterByProvince(String province) {
+        return findAll().stream()
+                .filter(data -> data.getProvince().equalsIgnoreCase(province)).toList();
+    }
+
+    private static double getAvgPrecipitation(List<MeteorologyData> dataList) {
+        return dataList.stream()
+                .mapToDouble(MeteorologyData::getPrecipitation)
+                .average()
+                .orElse(0.0);
+    }
+
+    @NotNull
+    private static Optional<MeteorologyData> getMaxTemperature(List<MeteorologyData> dataList) {
+        return dataList.stream()
+                .max(Comparator.comparingDouble(MeteorologyData::getMaxTemperature));
+    }
+
+    @NotNull
+    private static Optional<MeteorologyData> getMinTemperature(List<MeteorologyData> dataList) {
+        return dataList.stream()
+                .min(Comparator.comparingDouble(MeteorologyData::getMaxTemperature));
+    }
+
+    @NotNull
+    private static Optional<MeteorologyData> getMaxPrecipitation(List<MeteorologyData> dataList) {
+        return dataList.stream()
+                .max(Comparator.comparingDouble(MeteorologyData::getPrecipitation));
+    }
+
+    private static double getAvgMinTemperature(List<MeteorologyData> dataList) {
+        return dataList.stream()
+                .mapToDouble(MeteorologyData::getMinTemperature)
+                .average()
+                .orElse(0.0);
+    }
+
+    private static double getAvgMaxTemperature(List<MeteorologyData> dataList) {
+        return dataList.stream()
+                .mapToDouble(MeteorologyData::getMaxTemperature)
+                .average()
+                .orElse(0.0);
     }
 
     /**
@@ -218,11 +247,11 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
         List<MeteorologyDataGropuedDTO> result = new ArrayList<>();
         groupedData.forEach((date, provinceDataMap) -> provinceDataMap.forEach((province, meteorologyDataList) ->
                 result.add(MeteorologyDataGropuedDTO.builder()
-                .date(date)
-                .province(province)
-                .meteorologyData(meteorologyDataList)
-                .build()
-        )));
+                        .date(date)
+                        .province(province)
+                        .meteorologyData(meteorologyDataList)
+                        .build()
+                )));
         return result;
     }
 
@@ -238,4 +267,5 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
                 .map(MeteorologyData::getMaxTemperature)
                 .orElse(0.0f);
     }
+
 }

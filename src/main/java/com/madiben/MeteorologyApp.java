@@ -109,7 +109,7 @@ public class MeteorologyApp {
     private void printDayDataByProvince(String province) {
         StringBuilder sb = new StringBuilder();
         sb.append("\n").append("Datos de la provincia ").append(province).append(": ").append("\n");
-        controller.getProvinceData(province).forEach(e -> {
+        controller.getProvinceDataFilterByProvince(province).forEach(e -> {
 
             AtomicReference<Float> maxTemperature = new AtomicReference<>(0.0f);
             AtomicReference<String> maxTemperatureLocation = new AtomicReference<>("");
