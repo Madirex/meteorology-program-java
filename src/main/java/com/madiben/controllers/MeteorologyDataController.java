@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +18,7 @@ import java.util.Optional;
  */
 public class MeteorologyDataController implements BaseController<MeteorologyData> {
     private final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
-
+    List<MeteorologyData> meteorologyDataList;
     private final MeteorologyDataService meteorologyDataService;
 
     /**
@@ -113,5 +114,16 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
         }
         return removed;
     }
-    // Temperatura maxima y minima en cada uno de los dias
+
+    public static double tempMax(List<MeteorologyData> dataList) {
+        Optional<MeteorologyData> maxTemperatureData = dataList.stream()
+                .max(Comparator.comparing(MeteorologyData::getMaxTemperature));
+
+
+    }
+
+    public static double tempMin(List<MeteorologyData> dataList) {
+            Optional<MeteorologyData>  maxTemperature= dataList.stream()
+                .min(Comparator.comparing(MeteorologyData::getMinTemperature));
+    }
 }
