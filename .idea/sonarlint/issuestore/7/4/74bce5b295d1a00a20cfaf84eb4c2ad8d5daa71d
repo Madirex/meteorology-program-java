@@ -1,14 +1,11 @@
 
-¶
-java:S6548"˜A Singleton implementation was detected. Make sure the use of the Singleton pattern is required and the implementation is the right one for the context.(º¡Ëß8ê¼Ä—®1
-T
-java:S1135"2Complete the task associated to this TODO comment.(ã’Ğüÿÿÿÿ8ùªô—®1
-O
-java:S1135*"2Complete the task associated to this TODO comment.(ÂÃÂ¦8ıªô—®1
-L	java:S1064"+Replace this use of System.out by a logger.(ªŠ¦úùÿÿÿÿ8˜½Ä—®1
-L	java:S106D"+Replace this use of System.out by a logger.(ƒ³úÄøÿÿÿÿ8ˆ«ô—®1
-]	java:S125<"<This block of commented-out lines of code should be removed.(¤õûÿÿÿÿÿ8˜¦Å—®1
-O
-java:S1135;"2Complete the task associated to this TODO comment.(¥íÚì8½Ä—®1
-T
-java:S1135C"2Complete the task associated to this TODO comment.(»ËÆ‚úÿÿÿÿ8™½Ä—®1
+f
+java:S1192¾"JDefine a constant instead of duplicating this literal "\tLugar: " 3 times.(ò‹÷«ùÿÿÿÿ
+?
+java:S2629n"$Invoke method(s) only conditionally.(‚…šóûÿÿÿÿ
+@
+java:S2629Œ"$Invoke method(s) only conditionally.(‚…šóûÿÿÿÿ
+;
+java:S2629È"$Invoke method(s) only conditionally.(ƒÕÎ³
+¯
+java:S6548"˜A Singleton implementation was detected. Make sure the use of the Singleton pattern is required and the implementation is the right one for the context.(º¡Ëß
