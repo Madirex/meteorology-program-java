@@ -2,6 +2,7 @@ package com.madiben.controllers;
 
 import com.madiben.exceptions.MeteorologyDataException;
 import com.madiben.models.MeteorologyData;
+import com.madiben.models.dto.MeteorologyDataGropuedDTO;
 import com.madiben.models.dto.MeteorologyProvinceDayData;
 import com.madiben.services.crud.meteorology.MeteorologyDataService;
 import com.madiben.services.database.DatabaseManager;
@@ -146,7 +147,7 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
                 .min(Comparator.comparing(MeteorologyData::getMinTemperature));
         return 0.0;
     }
-    
+
 
     /**
      * Devuelve los datos de meteorología con mayor precipitación
@@ -180,6 +181,7 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
                             .mapToDouble(MeteorologyData::getMaxTemperature)
                             .average()
                             .orElse(0.0);
+
                     double avgMinTemperature = dataList.stream()
                             .mapToDouble(MeteorologyData::getMinTemperature)
                             .average()
@@ -190,6 +192,7 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
                             .mapToDouble(MeteorologyData::getPrecipitation)
                             .average()
                             .orElse(0.0);
+
                     return MeteorologyProvinceDayData.builder()
                             .date(date)
                             .maxTemperature(maxTemperatureData)
@@ -202,4 +205,22 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
                 })
                 .collect(Collectors.toList());
     }
+
+    public List<MeteorologyDataGropuedDTO> dataGrouper() {
+        List<MeteorologyDataGropuedDTO> DataGrouped = findAll().stream()
+                .collect(Collectors.groupingBy(MeteorologyData::getProvince))
+                .map(entry1 -> {
+                    String province1 = entry1.getKey();
+                    List<MeteorologyData> dataList1 = entry1.getValue();
+                    Optional<MeteorologyData> minTemperatureData1 = dataList1.stream()
+                            .min(Comparator.comparingDouble(MeteorologyData::getMinTemperature));
+                    return MeteorologyDataGropuedDTO.builder()
+                            .date(date)
+                            .province(province1)
+                            .meteorologyData(minTemperatureData1)
+                            .build();
+                })
+                .toList();
+    }
+
 }
