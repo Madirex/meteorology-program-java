@@ -73,13 +73,13 @@ public class CsvManager {
     public List<MeteorologyData> fileToMeteorologyDataList(String path, String fileName) throws ReadCSVFailException {
         LocalDate date = UtilParsers.getInstance().parseFileNameToDate(fileName);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream
-                (path + File.separator + fileName), StandardCharsets.ISO_8859_1))) {
+                (path + File.separator + fileName), "Windows-1252"))) {
             return reader.lines()
                     .map(line -> line.split(";"))
                     .map(values -> MeteorologyData.builder()
                             .date(date)
-                            .location(values[0])
-                            .province(values[1])
+                            .location(decodeWindows1252ToUTF8(values[0]))
+                            .province(decodeWindows1252ToUTF8(values[1]))
                             .maxTemperature(Float.parseFloat(values[2]))
                             .maxTemperatureTime(UtilParsers.parseLocalTime(values[3]))
                             .minTemperature(Float.parseFloat(values[4]))
@@ -90,6 +90,21 @@ public class CsvManager {
                     .toList();
         } catch (IOException e) {
             throw new ReadCSVFailException(e.getMessage());
+        }
+    }
+
+    /**
+     * Decodifica un string de windows-1252 a UTF-8
+     *
+     * @param input String en windows-1252
+     * @return String en UTF-8
+     */
+    private String decodeWindows1252ToUTF8(String input) {
+        try {
+            return new String(input.getBytes(StandardCharsets.UTF_8), "windows-1252");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return input;
         }
     }
 }

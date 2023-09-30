@@ -2,18 +2,17 @@ package com.madiben.controllers;
 
 import com.madiben.exceptions.MeteorologyDataException;
 import com.madiben.models.MeteorologyData;
-import com.madiben.models.dto.MeteorologyDataGropuedDTO;
+import com.madiben.models.dto.MeteorologyDataGroupedDTO;
+import com.madiben.models.dto.MeteorologyDayData;
 import com.madiben.models.dto.MeteorologyProvinceDayData;
 import com.madiben.services.crud.meteorology.MeteorologyDataService;
 import com.madiben.services.database.DatabaseManager;
 import com.madiben.services.io.ExportManager;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
  */
 public class MeteorologyDataController implements BaseController<MeteorologyData> {
     private final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
-    List<MeteorologyData> meteorologyDataList;
     private final MeteorologyDataService meteorologyDataService;
 
     /**
@@ -136,21 +134,6 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
         return true;
     }
 
-    //TODO: JDOCS y FIXES
-
-    public double tempMax(List<MeteorologyData> dataList) {
-        Optional<MeteorologyData> maxTemperatureData = dataList.stream()
-                .max(Comparator.comparing(MeteorologyData::getMaxTemperature));
-        return 0.0;
-    }
-
-    public double tempMin(List<MeteorologyData> dataList) {
-        Optional<MeteorologyData> maxTemperature = dataList.stream()
-                .min(Comparator.comparing(MeteorologyData::getMinTemperature));
-        return 0.0;
-    }
-
-
     /**
      * Devuelve los datos de meteorología con mayor precipitación
      *
@@ -173,62 +156,105 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
                     List<MeteorologyData> dataList = entry.getValue();
                     return MeteorologyProvinceDayData.builder()
                             .date(entry.getKey())
-                            .maxTemperature(getMaxTemperature(dataList))
-                            .minTemperature(getMinTemperature(dataList))
-                            .avgMaxTemperature(getAvgMaxTemperature(dataList))
-                            .avgMinTemperature(getAvgMinTemperature(dataList))
-                            .maxPrecipitation(getMaxPrecipitation(dataList))
-                            .avgPrecipitation(getAvgPrecipitation(dataList))
+                            .maxTemperature(getDataOfMaxTemperature(dataList))
+                            .minTemperature(getDataOfMinTemperature(dataList))
+                            .avgMaxTemperature(avgMaxTemperature(dataList))
+                            .avgMinTemperature(avgMinTemperature(dataList))
+                            .maxPrecipitation(getDataOfMaxPrecipitation(dataList))
+                            .avgPrecipitation(avgPrecipitation(dataList))
                             .build();
-                })
-                .collect(Collectors.toList());
+                }).toList();
     }
 
-    @NotNull
+    /**
+     * Devuelve una lista de MeteorologyDayData con los datos de cada día
+     *
+     * @return Lista de MeteorologyDayData con los datos de cada día
+     */
+    public List<MeteorologyDayData> getDayData(){
+        List<MeteorologyDayData> list = new ArrayList<>();
+        findAll().stream()
+                .collect(Collectors.groupingBy(MeteorologyData::getDate))
+                .forEach((key, value) -> list.add(MeteorologyDayData.builder()
+                .date(key)
+                .maxTemperature(getDataOfMaxTemperature(value))
+                .minTemperature(getDataOfMinTemperature(value))
+                .maxPrecipitation(getDataOfMaxPrecipitation(value)).build()));
+        return list;
+    }
+
+    /**
+     * Devuelve un mapa con los datos de meteorología agrupados por fecha
+     *
+     * @param province Provincia a consultar
+     * @return Mapa con los datos de meteorología agrupados por fecha
+     */
     private Map<LocalDate, List<MeteorologyData>> mapDataByDate(String province) {
-        return filterByProvince(province).stream()
+        return getDataFilterByProvince(province).stream()
                 .collect(Collectors.groupingBy(MeteorologyData::getDate));
     }
 
-    @NotNull
-    private List<MeteorologyData> filterByProvince(String province) {
+    /**
+     * Devuelve una lista de MeteorologyData con los datos de meteorología de una provincia
+     *
+     * @param province Provincia a consultar
+     * @return Lista de MeteorologyData con los datos de meteorología de una provincia
+     */
+    private List<MeteorologyData> getDataFilterByProvince(String province) {
         return findAll().stream()
                 .filter(data -> data.getProvince().equalsIgnoreCase(province)).toList();
     }
 
-    private static double getAvgPrecipitation(List<MeteorologyData> dataList) {
-        return dataList.stream()
-                .mapToDouble(MeteorologyData::getPrecipitation)
-                .average()
-                .orElse(0.0);
-    }
-
-    @NotNull
-    private static Optional<MeteorologyData> getMaxTemperature(List<MeteorologyData> dataList) {
+    /**
+     * Devuelve los datos de meteorología con mayor temperatura
+     *
+     * @return Optional de MeteorologyData con los datos de meteorología con mayor temperatura
+     */
+    private Optional<MeteorologyData> getDataOfMaxTemperature(List<MeteorologyData> dataList) {
         return dataList.stream()
                 .max(Comparator.comparingDouble(MeteorologyData::getMaxTemperature));
     }
 
-    @NotNull
-    private static Optional<MeteorologyData> getMinTemperature(List<MeteorologyData> dataList) {
+    /**
+     * Devuelve los datos de meteorología con menor temperatura
+     *
+     * @return Optional de MeteorologyData con los datos de meteorología con menor temperatura
+     */
+    private Optional<MeteorologyData> getDataOfMinTemperature(List<MeteorologyData> dataList) {
         return dataList.stream()
                 .min(Comparator.comparingDouble(MeteorologyData::getMaxTemperature));
     }
 
-    @NotNull
-    private static Optional<MeteorologyData> getMaxPrecipitation(List<MeteorologyData> dataList) {
+    /**
+     * Devuelve los datos de meteorología con mayor precipitación
+     *
+     * @return Optional de MeteorologyData con los datos de meteorología con mayor precipitación
+     */
+    private Optional<MeteorologyData> getDataOfMaxPrecipitation(List<MeteorologyData> dataList) {
         return dataList.stream()
                 .max(Comparator.comparingDouble(MeteorologyData::getPrecipitation));
     }
 
-    private static double getAvgMinTemperature(List<MeteorologyData> dataList) {
+    /**
+     * Devuelve la temperatura mínima de una lista de MeteorologyData
+     *
+     * @param dataList Lista de MeteorologyData
+     * @return Temperatura mínima
+     */
+    private double avgMinTemperature(List<MeteorologyData> dataList) {
         return dataList.stream()
                 .mapToDouble(MeteorologyData::getMinTemperature)
                 .average()
                 .orElse(0.0);
     }
 
-    private static double getAvgMaxTemperature(List<MeteorologyData> dataList) {
+    /**
+     * Devuelve la temperatura máxima de una lista de MeteorologyData
+     *
+     * @param dataList Lista de MeteorologyData
+     * @return Temperatura máxima
+     */
+    private double avgMaxTemperature(List<MeteorologyData> dataList) {
         return dataList.stream()
                 .mapToDouble(MeteorologyData::getMaxTemperature)
                 .average()
@@ -236,20 +262,20 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
     }
 
     /**
-     * Devuelve una lista de MeteorologyDataGropuedDTO con los datos de meteorología agrupados por fecha y provincia
+     * Devuelve una lista de MeteorologyDataGroupedDTO con los datos de meteorología agrupados por fecha y provincia
      *
-     * @return Lista de MeteorologyDataGropuedDTO con los datos de meteorología agrupados por fecha y provincia
+     * @return Lista de MeteorologyDataGroupedDTO con los datos de meteorología agrupados por fecha y provincia
      */
-    public List<MeteorologyDataGropuedDTO> dataGrouper() {
+    public List<MeteorologyDataGroupedDTO> dataGrouper() {
         Map<LocalDate, Map<String, List<MeteorologyData>>> groupedData = findAll().stream()
                 .collect(Collectors.groupingBy(MeteorologyData::getDate,
                         Collectors.groupingBy(MeteorologyData::getProvince)));
-        List<MeteorologyDataGropuedDTO> result = new ArrayList<>();
-        groupedData.forEach((date, provinceDataMap) -> provinceDataMap.forEach((province, meteorologyDataList) ->
-                result.add(MeteorologyDataGropuedDTO.builder()
+        List<MeteorologyDataGroupedDTO> result = new ArrayList<>();
+        groupedData.forEach((date, provinceDataMap) -> provinceDataMap.forEach((province, meteoList) ->
+                result.add(MeteorologyDataGroupedDTO.builder()
                         .date(date)
                         .province(province)
-                        .meteorologyData(meteorologyDataList)
+                        .meteorologyData(meteoList)
                         .build()
                 )));
         return result;
@@ -268,6 +294,12 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
                 .orElse(0.0f);
     }
 
+    /**
+     * Devuelve la temperatura mínima de una lista de MeteorologyData
+     *
+     * @param dataList Lista de MeteorologyData
+     * @return Temperatura mínima
+     */
     public float minTemperature(List<MeteorologyData> dataList) {
         return dataList.stream()
                 .min(Comparator.comparing(MeteorologyData::getMinTemperature))
@@ -275,22 +307,42 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
                 .orElse(0.0f);
     }
 
+    /**
+     * Devuelve la temperatura media de una lista de MeteorologyData
+     *
+     * @param dataList Lista de MeteorologyData
+     * @return Temperatura media
+     */
     public double avgPrecipitation(List<MeteorologyData> dataList) {
-        return  dataList.stream()
-                .mapToDouble(meteorologyData -> meteorologyData.getPrecipitation())
+        return dataList.stream()
+                .mapToDouble(MeteorologyData::getPrecipitation)
                 .average()
                 .orElse(0.0);
-
-
-
     }
-    public List<String> withPrecipitation(List<MeteorologyData> dataList) {
+
+    /**
+     * Devuelve la temperatura media de una lista de MeteorologyData
+     *
+     * @param dataList Lista de MeteorologyData
+     * @return Temperatura media
+     */
+    public double avgTemperature(List<MeteorologyData> dataList) {
+        return dataList.stream()
+                .mapToDouble(e -> ((e.getMaxTemperature() + e.getMinTemperature()) / 2))
+                .average()
+                .orElse(0.0);
+    }
+
+    /**
+     * Devuelve una lista de Strings de localidad con precipitación
+     *
+     * @param dataList Lista de datos de meteorología
+     * @return Lista de Strings de localidad con precipitación
+     */
+    public List<String> locationListWithPrecipitation(List<MeteorologyData> dataList) {
         return dataList.stream()
                 .filter(meteorologyData -> meteorologyData.getPrecipitation() > 0)
                 .map(MeteorologyData::getLocation)
                 .toList();
     }
-
-
-
 }

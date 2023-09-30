@@ -46,46 +46,98 @@ public class MeteorologyApp {
      * Método que ejecuta la aplicación
      */
     public void run() {
+        readCSVFilesAtFolderAndSaveToDatabase();
+        printQueries();
+        exportProvinceToJson("Madrid");
+        finish();
+    }
+
+    /**
+     * Método que lee los archivos CSV de la carpeta data y los guarda en la base de datos
+     */
+    private void readCSVFilesAtFolderAndSaveToDatabase() {
         try {
             for (MeteorologyData meteorologyData : CsvManager.getInstance()
                     .folderDataToMeteorologyList(System.getProperty("user.dir") + File.separator + "data")) {
                 controller.save(meteorologyData);
-                if (meteorologyData.getLocation().equalsIgnoreCase("Leciñena")) {
-                    System.out.println("=DDDDDDDDDDD"); //TODO: FIX
-                }
             }
         } catch (ReadCSVFailException e) {
             logger.error("Error al leer el CSV", e);
         }
+    }
 
-        //TODO: PRINTEAR CONSULTAS API STREAM
-        System.out.println("Número de elementos: " + controller.findAll().size());
+    /**
+     * Método que imprime los datos de las consultas
+     */
+    private void printQueries() {
+        printDataDays();
+        printDataGroupedByProvincesAndDate();
+        printMaxPrecipitationData();
+        printDayDataByProvince("Barcelona");
+    }
 
-        /////////////////////////////////////
+    /**
+     * Método que imprime los datos de todos los días
+     */
+    private void printDataDays() {
+        StringBuilder str = new StringBuilder();
+        controller.getDayData().forEach(d -> {
+            String maxTempLocation = "-";
+            String minTempLocation = "-";
+            String maxPrecipitationLocation = "-";
+            float maxPrecipitation = 0.0f;
+            if (d.getMaxTemperature().isPresent()) {
+                maxTempLocation = d.getMaxTemperature().get().getLocation();
+            }
+            if (d.getMinTemperature().isPresent()) {
+                minTempLocation = d.getMinTemperature().get().getLocation();
+            }
+            if (d.getMaxPrecipitation().isPresent()) {
+                maxPrecipitationLocation = d.getMaxPrecipitation().get().getLocation();
+                maxPrecipitation = d.getMaxPrecipitation().get().getPrecipitation();
+            }
+            str.append("\n");
+            str.append("Fecha: ").append(d.getDate()).append("\n")
+                    .append("\t").append("- Lugar temperatura máxima: ").append(maxTempLocation).append("\n")
+                    .append("\t").append("- Lugar temperatura mínima: ").append(minTempLocation).append("\n").append("\n")
+                    .append("\t").append("- Lugar precipitación máxima: ").append(maxPrecipitationLocation).append("\n")
+                    .append("\t").append("- Precipitación máxima: ").append(maxPrecipitation).append("\n")
+                    .append("\n");
+        });
+        if (str.isEmpty()) {
+            str.append("No hay datos\n");
+        }
+        logger.info(str.toString());
+    }
+
+    /**
+     * Método que imprime los datos agrupados por fecha y provincia
+     */
+    private void printDataGroupedByProvincesAndDate() {
         StringBuilder str = new StringBuilder();
         controller.dataGrouper().forEach(e -> {
             str.append("\n");
             str.append("Fecha: ").append(e.getDate()).append("\t").append("Provincia: ").append(e.getProvince())
                     .append("\n");
             str.append("Máxima temperatura: ").append(controller.maxTemperature(e.getMeteorologyData())).append("\n");
-            str.append("Mínima temperatura: ").append(0.0).append("\n");
-            str.append("Media de temperatura: ").append(0.0).append("\n");
-            str.append("Media de precipitación: ").append(0.0).append("\n");
-            str.append("Lugares donde ha llovido: ").append(0.0).append("\n");
+            str.append("Mínima temperatura: ").append(controller.minTemperature(e.getMeteorologyData())).append("\n");
+            str.append("Media de temperatura: ").append(String.format("%.2f", controller
+                    .avgTemperature(e.getMeteorologyData()))).append("\n");
+            str.append("Media de precipitación: ").append(String.format("%.2f", controller
+                    .avgPrecipitation(e.getMeteorologyData()))).append("\n");
+            StringBuilder locations = new StringBuilder();
+            controller.locationListWithPrecipitation(e.getMeteorologyData()).forEach(d ->
+                    locations.append("- ").append(d).append("\n"));
+            if (locations.isEmpty()) {
+                str.append("No ha llovido en ningún lugar\n");
+            } else {
+                str.append("Lugares donde ha llovido: \n").append(locations);
+            }
         });
-        if (str.isEmpty()){
-            str.append("No hay datos");
+        if (str.isEmpty()) {
+            str.append("No hay datos\n");
         }
         logger.info(str.toString());
-
-        /////////////////////////////////////
-
-        printMaxPrecipitationData();
-        printDayDataByProvince("Barcelona");
-
-        exportProvinceToJson("Madrid");
-
-        finish();
     }
 
     /**

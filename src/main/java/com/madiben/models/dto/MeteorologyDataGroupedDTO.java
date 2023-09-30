@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Data
 @Builder
-public class MeteorologyDataGropuedDTO {
+public class MeteorologyDataGroupedDTO {
     private LocalDate date;
     private String province;
     private List<MeteorologyData> meteorologyData;
