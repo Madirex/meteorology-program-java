@@ -4,6 +4,7 @@ import com.madiben.exceptions.MeteorologyDataException;
 import com.madiben.models.MeteorologyData;
 import com.madiben.services.crud.meteorology.MeteorologyDataService;
 import com.madiben.services.database.DatabaseManager;
+import com.madiben.services.io.ExportManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,5 +114,21 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
         }
         return removed;
     }
-    // Temperatura maxima y minima en cada uno de los dias
+
+    /**
+     * Exporta los datos de una provincia a un archivo CSV
+     *
+     * @param province Provincia a exportar
+     * @return ¿Exportado?
+     */
+    public boolean exportDataByProvince(String province) {
+        try {
+            ExportManager.getInstance().exportMeteorologyData(findAll().stream().filter(meteorologyData ->
+                    meteorologyData.getProvince().equalsIgnoreCase(province)).toList(), province);
+        } catch (Exception e) {
+            logger.error("Error al exportar los datos por provincia", e);
+            return false;
+        }
+        return true;
+    }
 }

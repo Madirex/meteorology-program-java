@@ -49,7 +49,7 @@ public class MeteorologyApp {
                     .folderDataToMeteorologyList(System.getProperty("user.dir") + File.separator + "data")) {
                 controller.save(meteorologyData);
                 if (meteorologyData.getLocation().equalsIgnoreCase("Leciñena")) {
-                    System.out.println("=DDDDDDDDDDD");
+                    System.out.println("=DDDDDDDDDDD"); //TODO: FIX
                 }
             }
         } catch (ReadCSVFailException e) {
@@ -59,12 +59,31 @@ public class MeteorologyApp {
         //TODO: PRINTEAR CONSULTAS API STREAM
         System.out.println("Número de elementos: " + controller.findAll().size());
 
-        //TODO: EXPORTAR LOS DATOS DE UNA PROVINCIA DADA A UN FICHERO JSON
-        System.out.println("áfs");
-
+        /////////////////////////////////////
+        exportProvinceToJson("Madrid");
         finish();
     }
 
+    /**
+     * Método que exporta los datos de una provincia a un fichero JSON
+     *
+     * @param province Provincia a exportar
+     */
+    private void exportProvinceToJson(String province) {
+        String msg = "Exportando datos de la provincia " + province + " a JSON...";
+        logger.info(msg);
+        if (controller.exportDataByProvince(province)) {
+            msg = "Datos de la provincia " + province + " exportados a JSON";
+            logger.info(msg);
+        } else {
+            msg = "Error al exportar los datos de la provincia \" + province + \" a JSON";
+            logger.error(msg);
+        }
+    }
+
+    /**
+     * Método de finalización del programa
+     */
     private void finish() {
         DatabaseManager.getInstance().close();
     }
