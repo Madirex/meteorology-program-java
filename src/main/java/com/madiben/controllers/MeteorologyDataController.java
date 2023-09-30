@@ -268,4 +268,29 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
                 .orElse(0.0f);
     }
 
+    public float minTemperature(List<MeteorologyData> dataList) {
+        return dataList.stream()
+                .min(Comparator.comparing(MeteorologyData::getMinTemperature))
+                .map(MeteorologyData::getMinTemperature)
+                .orElse(0.0f);
+    }
+
+    public double avgPrecipitation(List<MeteorologyData> dataList) {
+        return  dataList.stream()
+                .mapToDouble(meteorologyData -> meteorologyData.getPrecipitation())
+                .average()
+                .orElse(0.0);
+
+
+
+    }
+    public List<String> withPrecipitation(List<MeteorologyData> dataList) {
+        return dataList.stream()
+                .filter(meteorologyData -> meteorologyData.getPrecipitation() > 0)
+                .map(MeteorologyData::getLocation)
+                .toList();
+    }
+
+
+
 }
