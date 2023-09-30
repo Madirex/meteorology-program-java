@@ -113,4 +113,5 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
         }
         return removed;
     }
+    // Temperatura maxima y minima en cada uno de los dias
 }
