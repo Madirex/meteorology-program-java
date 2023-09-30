@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Clase principal de la aplicación
@@ -60,8 +62,72 @@ public class MeteorologyApp {
         System.out.println("Número de elementos: " + controller.findAll().size());
 
         /////////////////////////////////////
+        printMaxPrecipitationData();
+        printDayDataByProvince("Barcelona");
+
         exportProvinceToJson("Madrid");
+
         finish();
+    }
+
+    /**
+     * Método que imprime los datos de la localidad donde más ha llovido
+     */
+    private void printMaxPrecipitationData() {
+        Optional<MeteorologyData> data = controller.getMaxPrecipitationData();
+        if (data.isPresent()) {
+            String strData = "\n\nLugar donde más ha llovido: " + data.get().getLocation() + "\n\n";
+            logger.info(strData);
+        } else {
+            logger.info("\n\nNo hay datos de precipitación\n\n");
+        }
+    }
+
+    /**
+     * Método que imprime datos de todos los días de una provincia
+     *
+     * @param province Provincia a imprimir
+     */
+    private void printDayDataByProvince(String province) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n").append("Datos de la provincia ").append(province).append(": ").append("\n");
+        controller.getProvinceData(province).forEach(e -> {
+
+            AtomicReference<Float> maxTemperature = new AtomicReference<>(0.0f);
+            AtomicReference<String> maxTemperatureLocation = new AtomicReference<>("");
+            AtomicReference<Float> minTemperature = new AtomicReference<>(0.0f);
+            AtomicReference<String> minTemperatureLocation = new AtomicReference<>("");
+            AtomicReference<Float> maxPrecipitation = new AtomicReference<>(0.0f);
+            AtomicReference<String> maxPrecipitationLocation = new AtomicReference<>("");
+
+            e.getMaxTemperature().ifPresent(meteorologyData -> {
+                maxTemperature.set(meteorologyData.getMaxTemperature());
+                maxTemperatureLocation.set(meteorologyData.getLocation());
+            });
+
+            e.getMinTemperature().ifPresent(meteorologyData -> {
+                minTemperature.set(meteorologyData.getMinTemperature());
+                minTemperatureLocation.set(meteorologyData.getLocation());
+            });
+
+            e.getMaxPrecipitation().ifPresent(meteorologyData -> {
+                maxPrecipitation.set(meteorologyData.getPrecipitation());
+                maxPrecipitationLocation.set(meteorologyData.getLocation());
+            });
+
+            sb.append("\n").append("Día: ").append(e.getDate()).append("\n");
+            sb.append("Temperatura máxima: ").append(maxTemperature).append("\n");
+            sb.append("\tLugar: ").append(maxTemperatureLocation).append("\n");
+            sb.append("Temperatura mínima: ").append(minTemperature).append("\n");
+            sb.append("\tLugar: ").append(minTemperatureLocation).append("\n");
+            sb.append("Media de la temperatura máxima: ").append(String.format("%.2f", e.getAvgMaxTemperature())).append("\n");
+            sb.append("Media de la temperatura mínima: ").append(String.format("%.2f", e.getAvgMinTemperature())).append("\n");
+            sb.append("Precipitación máxima: ").append(maxPrecipitation).append("\n");
+            sb.append("\tLugar: ").append(maxPrecipitationLocation).append("\n");
+            sb.append("Precipitación media: ").append(String.format("%.2f", e.getAvgPrecipitation())).append("\n");
+            sb.append("\n\n");
+        });
+        logger.info(sb.toString());
     }
 
     /**

@@ -2,6 +2,7 @@ package com.madiben.controllers;
 
 import com.madiben.exceptions.MeteorologyDataException;
 import com.madiben.models.MeteorologyData;
+import com.madiben.models.dto.MeteorologyProvinceDayData;
 import com.madiben.services.crud.meteorology.MeteorologyDataService;
 import com.madiben.services.database.DatabaseManager;
 import com.madiben.services.io.ExportManager;
@@ -9,10 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Controlador de MeteorologyData
@@ -133,15 +133,73 @@ public class MeteorologyDataController implements BaseController<MeteorologyData
         return true;
     }
 
-    public static double tempMax(List<MeteorologyData> dataList) {
+    //TODO: JDOCS y FIXES
+
+    public double tempMax(List<MeteorologyData> dataList) {
         Optional<MeteorologyData> maxTemperatureData = dataList.stream()
                 .max(Comparator.comparing(MeteorologyData::getMaxTemperature));
-
-
+        return 0.0;
     }
 
-    public static double tempMin(List<MeteorologyData> dataList) {
-            Optional<MeteorologyData>  maxTemperature= dataList.stream()
+    public double tempMin(List<MeteorologyData> dataList) {
+        Optional<MeteorologyData> maxTemperature = dataList.stream()
                 .min(Comparator.comparing(MeteorologyData::getMinTemperature));
+        return 0.0;
+    }
+    
+
+    /**
+     * Devuelve los datos de meteorología con mayor precipitación
+     *
+     * @return Optional de MeteorologyData con los datos de meteorología con mayor precipitación
+     */
+    public Optional<MeteorologyData> getMaxPrecipitationData() {
+        return findAll().stream()
+                .max(Comparator.comparing(MeteorologyData::getPrecipitation));
+    }
+
+    /**
+     * Devuelve una lista de MeteorologyProvinceDayData con los datos de cada día de la provincia
+     *
+     * @param province Provincia a consultar
+     * @return Lista de MeteorologyProvinceDayData con los datos de cada día de la provincia
+     */
+    public List<MeteorologyProvinceDayData> getProvinceData(String province) {
+        List<MeteorologyData> provinceList = findAll().stream()
+                .filter(data -> data.getProvince().equalsIgnoreCase(province)).toList();
+        Map<LocalDate, List<MeteorologyData>> dateMap = provinceList.stream()
+                .collect(Collectors.groupingBy(MeteorologyData::getDate));
+        return dateMap.entrySet().stream().map(entry -> {
+                    LocalDate date = entry.getKey();
+                    List<MeteorologyData> dataList = entry.getValue();
+                    Optional<MeteorologyData> maxTemperatureData = dataList.stream()
+                            .max(Comparator.comparingDouble(MeteorologyData::getMaxTemperature));
+                    Optional<MeteorologyData> minTemperatureData = dataList.stream()
+                            .min(Comparator.comparingDouble(MeteorologyData::getMaxTemperature));
+                    double avgMaxTemperature = dataList.stream()
+                            .mapToDouble(MeteorologyData::getMaxTemperature)
+                            .average()
+                            .orElse(0.0);
+                    double avgMinTemperature = dataList.stream()
+                            .mapToDouble(MeteorologyData::getMinTemperature)
+                            .average()
+                            .orElse(0.0);
+                    Optional<MeteorologyData> maxPrecipitation = dataList.stream()
+                            .max(Comparator.comparingDouble(MeteorologyData::getPrecipitation));
+                    double avgPrecipitation = dataList.stream()
+                            .mapToDouble(MeteorologyData::getPrecipitation)
+                            .average()
+                            .orElse(0.0);
+                    return MeteorologyProvinceDayData.builder()
+                            .date(date)
+                            .maxTemperature(maxTemperatureData)
+                            .minTemperature(minTemperatureData)
+                            .avgMaxTemperature(avgMaxTemperature)
+                            .avgMinTemperature(avgMinTemperature)
+                            .maxPrecipitation(maxPrecipitation)
+                            .avgPrecipitation(avgPrecipitation)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }
