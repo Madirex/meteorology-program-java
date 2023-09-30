@@ -1,0 +1,17 @@
+
+k
+java:S1192}"UDefine a constant instead of duplicating this literal " con parÃƒÂ¡metros: " 3 times.(ÿ”ğÒ
+v
+java:S1450"[Remove the "databaseName" field and declare it as a local variable in the relevant methods.(ê››ÿüÿÿÿÿ
+k
+java:S1450"URemove the "driver" field and declare it as a local variable in the relevant methods.(ÔÑì
+n
+java:S1450"XRemove the "serverUrl" field and declare it as a local variable in the relevant methods.(°èµ¬
+´
+java:S6548"˜A Singleton implementation was detected. Make sure the use of the Singleton pattern is required and the implementation is the right one for the context.( ùÓ‹ÿÿÿÿÿ
+L
+java:S1144ˆ"5Remove this unused private "beginTransaction" method.(áÌº•
+B
+java:S1144‘"+Remove this unused private "commit" method.(ßâÒı
+D
+java:S1144›"-Remove this unused private "rollback" method.(ÜÒ„ø

@@ -13,9 +13,11 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 /**
- * Clase principal de la aplicaci�n
+ * Clase principal de la aplicación
  */
 public class MeteorologyApp {
+    private MeteorologyDataController controller = new MeteorologyDataController
+            (MeteorologyDataServiceImpl.getInstance(new MeteorologyDataRepositoryImpl(DatabaseManager.getInstance())));
 
     private static MeteorologyApp meteorologyAppInstance;
     private final Logger logger = LoggerFactory.getLogger(MeteorologyApp.class);
@@ -27,7 +29,7 @@ public class MeteorologyApp {
     }
 
     /**
-     * M�todo que devuelve la instancia de MeteorologyApp
+     * Método que devuelve la instancia de MeteorologyApp
      *
      * @return Instancia de MeteorologyApp
      */
@@ -39,24 +41,36 @@ public class MeteorologyApp {
     }
 
     /**
-     * M�todo que ejecuta la aplicaci�n
+     * Método que ejecuta la aplicación
      */
     public void run() {
-        MeteorologyDataController controller = new MeteorologyDataController
-                (MeteorologyDataServiceImpl.getInstance(new MeteorologyDataRepositoryImpl(DatabaseManager.getInstance())));
+        int counter = 0;
+
         try {
             for (MeteorologyData meteorologyData : CsvManager.getInstance()
                     .folderDataToMeteorologyList(System.getProperty("user.dir") + File.separator + "data")) {
                 controller.save(meteorologyData);
+                if (meteorologyData.getLocation().equalsIgnoreCase("Leciñena")) {
+                    System.out.println("=DDDDDDDDDDD");
+                }
+                counter++;
             }
         } catch (ReadCSVFailException e) {
             logger.error("Error al leer el CSV", e);
         }
 
+
+
         //TODO: PRINTEAR CONSULTAS API STREAM
-        controller.findAll().forEach(e -> logger.info(e.toString()));
+        System.out.println("Número de elementos: " + controller.findAll().size());
 
         //TODO: EXPORTAR LOS DATOS DE UNA PROVINCIA DADA A UN FICHERO JSON
         System.out.println("áfs");
+
+        finish();
+    }
+
+    private void finish() {
+        DatabaseManager.getInstance().close();
     }
 }

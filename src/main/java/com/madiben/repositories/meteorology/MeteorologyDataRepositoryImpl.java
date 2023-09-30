@@ -26,6 +26,7 @@ public class MeteorologyDataRepositoryImpl implements MeteorologyDataRepository 
     public List<MeteorologyData> findAll() throws SQLException {
         List<MeteorologyData> list = new ArrayList<>();
         var sql = "SELECT * FROM meteorologyData";
+        database.beginTransaction();
         var res = database.select(sql).orElseThrow();
         while (res.next()) {
             list.add(MeteorologyData.builder()
@@ -40,7 +41,7 @@ public class MeteorologyDataRepositoryImpl implements MeteorologyDataRepository 
                     .precipitation(res.getFloat("Precipitation"))
                     .build());
         }
-        database.close();
+        database.commit();
         return list;
     }
 
@@ -54,6 +55,7 @@ public class MeteorologyDataRepositoryImpl implements MeteorologyDataRepository 
     public Optional<MeteorologyData> findById(String id) throws SQLException {
         Optional<MeteorologyData> optReturn = Optional.empty();
         var sql = "SELECT * FROM meteorologyData WHERE cod = ?";
+        database.beginTransaction();
         var res = database.select(sql, id).orElseThrow();
         if (res.next()) {
             optReturn = Optional.of(MeteorologyData.builder()
@@ -68,7 +70,7 @@ public class MeteorologyDataRepositoryImpl implements MeteorologyDataRepository 
                     .precipitation(res.getFloat("Precipitation"))
                     .build());
         }
-        database.close();
+        database.commit();
         return optReturn;
     }
 
@@ -80,9 +82,10 @@ public class MeteorologyDataRepositoryImpl implements MeteorologyDataRepository 
      */
     @Override
     public Optional<MeteorologyData> save(MeteorologyData entity) throws SQLException {
-        var sql = "INSERT INTO meteorologyData (ID, DayDate, Location, Province, MaxTemperature, MaxTemperatureTime, MinTemperature, MinTemperatureTime, Precipitation) " +
+        var sql = "INSERT INTO meteorologyData (ID, DayDate, Location, Province, MaxTemperature, MaxTemperatureTime, " +
+                "MinTemperature, MinTemperatureTime, Precipitation) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        database.open();
+        database.beginTransaction();
         database.insertAndGetKey(sql, entity.getUuid().toString(),
                 entity.getDate(),
                 entity.getLocation(),
@@ -92,7 +95,7 @@ public class MeteorologyDataRepositoryImpl implements MeteorologyDataRepository 
                 entity.getMinTemperature(),
                 entity.getMinTemperatureTime(),
                 entity.getPrecipitation());
-        database.close();
+        database.commit();
         return Optional.of(entity);
     }
 
@@ -105,9 +108,9 @@ public class MeteorologyDataRepositoryImpl implements MeteorologyDataRepository 
     @Override
     public boolean delete(String id) throws SQLException {
         var sql = "DELETE FROM meteorologyData WHERE cod= ?";
-        database.open();
+        database.beginTransaction();
         var rs = database.delete(sql, id);
-        database.close();
+        database.commit();
         return (rs == 1);
     }
 
@@ -120,9 +123,10 @@ public class MeteorologyDataRepositoryImpl implements MeteorologyDataRepository 
      */
     @Override
     public Optional<MeteorologyData> update(String id, MeteorologyData entity) throws SQLException {
-        var sql = "UPDATE meteorologyData SET DayDate = ?, Location = ?, Province = ?, MaxTemperature = ?, MaxTemperatureTime = ?, " +
+        var sql = "UPDATE meteorologyData SET DayDate = ?, Location = ?, Province = ?, MaxTemperature = ?, " +
+                "MaxTemperatureTime = ?, " +
                 "MinTemperature = ?, MinTemperatureTime = ?, Precipitation = ? WHERE ID = ?";
-        database.open();
+        database.beginTransaction();
         database.update(sql,
                 entity.getDate(),
                 entity.getLocation(),
@@ -133,7 +137,7 @@ public class MeteorologyDataRepositoryImpl implements MeteorologyDataRepository 
                 entity.getMinTemperatureTime(),
                 entity.getPrecipitation(),
                 id);
-        database.close();
+        database.commit();
         return Optional.of(entity);
     }
 }
