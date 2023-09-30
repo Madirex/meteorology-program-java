@@ -65,6 +65,11 @@ Para terminar, el programa exporta los datos de la base de datos de una provinci
 - Main: Clase principal del programa.
 - MeteorologyApp: La clase que se encarga de ejecutar toda la lógica del programa. Se le llama en el Main de la aplicación.
 
+## Ejecución
+<p align="center">
+  <img src="https://i.imgur.com/pbLVCgH.gif" alt="Programa funcionando">
+</p>
+
 ## Autores
 - [Ángel (Madirex)](https://github.com/Madirex)
 - [Rubén (Rubenoide03)](https://github.com/Rubenoide03)

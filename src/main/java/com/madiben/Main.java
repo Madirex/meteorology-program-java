@@ -1,7 +1,7 @@
 package com.madiben;
 
 /**
- * Clase principal de la aplicaci�n
+ * Clase principal de la aplicación
  */
 public class Main {
     /**
