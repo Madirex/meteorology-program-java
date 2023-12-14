@@ -42,7 +42,7 @@ Para terminar, el programa exporta los datos de la base de datos de una provinci
 - **database.properties:** Este fichero es el que se deberá modificar si se quiere cambiar la URL, el driver, el nombre de la base de datos o si se quiere forzar el reinicio de la tabla en el inicio del programa (eliminará y volverá a crear la tabla).
 
 ## ⚙ Tecnologías
-- Java 11.
+- Java 17.
 - Gradle.
 - Lombok.
 - H2 Database.
